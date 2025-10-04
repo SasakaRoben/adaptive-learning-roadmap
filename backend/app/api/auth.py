@@ -37,10 +37,8 @@ async def register_user(user: UserRegister):
             
     except HTTPException:
         raise
-    except Exception as e:
-        logger.exception("Error during registration")  # ✅ this prints full traceback
-        raise HTTPException(status_code=500, detail="Registration failed")
-
+    logger.exception("Error during registration")  # ✅ this prints full traceback
+    raise HTTPException(status_code=500, detail="Registration failed")
 
 @router.get("/check-username/{username}", response_model=UsernameCheck)
 async def check_username(username: str):
@@ -63,3 +61,38 @@ async def check_email(email: str):
             return EmailCheck(available=not exists)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/login", response_model=LoginResponse)
+async def login_user(credentials: UserLogin):
+    """Login a user"""
+    try:
+        with get_db() as conn:
+            cur = conn.cursor()
+            
+            # Try to find user by username or email
+            user = get_user_by_username(cur, credentials.username)
+            if not user:
+                # Try email if username not found
+                user = get_user_by_email(cur, credentials.username)
+            
+            # Check if user exists
+            if not user:
+                raise HTTPException(status_code=401, detail="Invalid username or password")
+            
+            # Verify password
+            if not verify_password(credentials.password, user['password_hash']):
+                raise HTTPException(status_code=401, detail="Invalid username or password")
+            
+            return LoginResponse(
+                id=user['id'],
+                username=user['username'],
+                email=user['email'],
+                message="Login successful"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Login failed: {str(e)}")
