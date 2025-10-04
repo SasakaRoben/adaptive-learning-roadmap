@@ -2,6 +2,10 @@ from fastapi import APIRouter, HTTPException
 from app.schemas.user import UserRegister, UserResponse, UsernameCheck, EmailCheck
 from app.crud.user import check_username_exists, check_email_exists, create_user
 from app.core.database import get_db
+import logging
+logger = logging.getLogger(__name__)
+
+
 
 router = APIRouter(prefix="/api", tags=["authentication"])
 
@@ -33,7 +37,8 @@ async def register_user(user: UserRegister):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
+        logger.exception("Error during registration")  # ✅ this prints full traceback
+        raise HTTPException(status_code=500, detail="Registration failed")
 
 @router.get("/check-username/{username}", response_model=UsernameCheck)
 async def check_username(username: str):
