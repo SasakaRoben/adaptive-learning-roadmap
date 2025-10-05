@@ -9,7 +9,11 @@ from app.core.database import get_db
 from datetime import timedelta
 from typing import Dict
 
-router = APIRouter(prefix="/api", tags=["authentication"])
+router = APIRouter(
+    prefix="/api",
+    tags=["authentication"],
+    responses={404: {"description": "Not found"}},
+)
 
 @router.post("/register", response_model=UserResponse)
 async def register_user(user: UserRegister):
