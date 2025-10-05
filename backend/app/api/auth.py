@@ -8,9 +8,6 @@ from app.core.dependencies import get_current_user
 from app.core.database import get_db
 from datetime import timedelta
 from typing import Dict
-import logging
-logger = logging.getLogger(__name__)
-
 
 router = APIRouter(prefix="/api", tags=["authentication"])
 
@@ -42,8 +39,9 @@ async def register_user(user: UserRegister):
     except HTTPException:
         raise
     except Exception as e:
-        logger.exception("Error during registration")  # ✅ this prints full traceback
-        raise HTTPException(status_code=500, detail="Registration failed")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
 
 @router.get("/check-username/{username}", response_model=UsernameCheck)
 async def check_username(username: str):
@@ -69,7 +67,7 @@ async def check_email(email: str):
 
 @router.post("/login", response_model=LoginResponse)
 async def login_user(credentials: UserLogin):
-    """Login a user"""
+    """Login a user and return JWT token"""
     try:
         with get_db() as conn:
             cur = conn.cursor()
@@ -88,11 +86,19 @@ async def login_user(credentials: UserLogin):
             if not verify_password(credentials.password, user['password_hash']):
                 raise HTTPException(status_code=401, detail="Invalid username or password")
             
+            # Create access token
+            access_token = create_access_token(
+                data={"sub": user['id'], "username": user['username']}
+            )
+            
             return LoginResponse(
-                id=user['id'],
-                username=user['username'],
-                email=user['email'],
-                message="Login successful"
+                access_token=access_token,
+                token_type="bearer",
+                user={
+                    "id": user['id'],
+                    "username": user['username'],
+                    "email": user['email']
+                }
             )
             
     except HTTPException:
@@ -101,3 +107,12 @@ async def login_user(credentials: UserLogin):
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Login failed: {str(e)}")
+
+@router.get("/me")
+async def get_current_user_info(current_user: Dict = Depends(get_current_user)):
+    """Get current authenticated user information (Protected route)"""
+    return {
+        "id": current_user['id'],
+        "username": current_user['username'],
+        "email": current_user['email']
+    }
