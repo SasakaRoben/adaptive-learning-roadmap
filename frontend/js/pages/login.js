@@ -44,14 +44,9 @@ form.addEventListener('submit', async function(e) {
         if (response.ok) {
             showAlert('Login successful! Redirecting...', 'success');
             
-            // Store user data (in a real app, you'd use JWT tokens)
-            if (rememberMeCheckbox.checked) {
-                sessionStorage.setItem('user', JSON.stringify({
-                    id: data.id,
-                    username: data.username,
-                    email: data.email
-                }));
-            }
+            // Store JWT token and user data
+            localStorage.setItem('access_token', data.access_token);
+            localStorage.setItem('user', JSON.stringify(data.user));
             
             // Redirect to dashboard
             setTimeout(() => {
