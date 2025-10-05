@@ -36,7 +36,7 @@ function initDashboard() {
 // Load user data
 async function loadUserData() {
     try {
-        const response = await authenticatedFetch('/me');
+        const response = await authenticatedFetch('api/me');
         if (!response) return;
 
         const user = await response.json();
