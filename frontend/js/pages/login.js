@@ -51,7 +51,7 @@ form.addEventListener('submit', async function(e) {
             // Redirect to dashboard
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
-            }, 1500);
+            }, 1000 );
         } else {
             if (response.status === 401) {
                 showAlert('Invalid username or password', 'error');

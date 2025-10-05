@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - LearnHub</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">LearnHub</div>
+            <div class="nav-right">
+                <span class="user-name" id="userName">Loading...</span>
+                <button class="btn-logout" id="logoutBtn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-section">
+            <h1>Welcome back, <span id="userDisplayName">Student</span>!</h1>
+            <p class="subtitle">Continue your learning journey</p>
+        </div>
+
+        <div class="roadmap-hero">
+            <h2>Your Learning Roadmap Progress</h2>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div class="progress-stats">
+                    <span id="progressText">0 of 0 topics completed</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+            </div>
+            <button class="btn-continue" id="continueBtn">
+                <span>Continue Learning</span>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🔥</div>
+                <div class="stat-value" id="streakDays">0</div>
+                <div class="stat-label">Day Streak</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-value" id="completedTopics">0</div>
+                <div class="stat-label">Topics Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏱️</div>
+                <div class="stat-value" id="timeSpent">0h</div>
+                <div class="stat-label">Time Spent</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-value" id="achievements">0</div>
+                <div class="stat-label">Achievements</div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h3>My Courses</h3>
+                    <span class="badge">Coming Soon</span>
+                </div>
+                <div class="card-body">
+                    <p class="placeholder-text">Your enrolled courses will appear here</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Recent Activity</h3>
+                    <span class="badge">Coming Soon</span>
+                </div>
+                <div class="card-body">
+                    <p class="placeholder-text">Your recent learning activity will be tracked here</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Recommendations</h3>
+                    <span class="badge">Coming Soon</span>
+                </div>
+                <div class="card-body">
+                    <p class="placeholder-text">AI-powered course recommendations based on your progress</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/utils/auth.js"></script>
+    <script src="js/pages/dashboard.js"></script>
+</body>
+</html>
