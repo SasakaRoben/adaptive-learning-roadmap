@@ -5,7 +5,6 @@ class UserLogin(BaseModel):
     password: str
 
 class LoginResponse(BaseModel):
-    id: int
-    username: str
-    email: str
-    message: str
+    access_token: str
+    token_type: str
+    user: dict
