@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Assessment - LearnHub</title>
+    <link rel="stylesheet" href="css/assessment.css">
+</head>
+<body>
+    <div class="container">
+        <div class="assessment-card">
+            <div class="header">
+                <h1>Skill Assessment</h1>
+                <p class="subtitle">Help us understand your current level</p>
+            </div>
+
+            <div id="assessmentContent">
+                <!-- Loading state -->
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading assessment...</p>
+                </div>
+
+                <!-- Questions -->
+                <div id="questionsContainer" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p class="progress-text" id="progressText">Question 1 of 7</p>
+
+                    <div id="questionCard" class="question-card">
+                        <!-- Questions will be inserted here -->
+                    </div>
+
+                    <div class="navigation-buttons">
+                        <button id="prevBtn" class="btn btn-secondary" style="display: none;">Previous</button>
+                        <button id="nextBtn" class="btn btn-primary">Next</button>
+                        <button id="submitBtn" class="btn btn-submit" style="display: none;">Submit Assessment</button>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div id="resultsContainer" style="display: none;">
+                    <div class="results-card">
+                        <div class="result-icon" id="resultIcon">🎯</div>
+                        <h2 id="resultTitle">Assessment Complete!</h2>
+                        <div class="score-display">
+                            <span class="score" id="scoreDisplay">0/7</span>
+                            <span class="percentage" id="percentageDisplay">0%</span>
+                        </div>
+                        <div class="level-badge" id="levelBadge">Beginner</div>
+                        <p class="result-message" id="resultMessage"></p>
+                        <p class="next-steps" id="nextSteps"></p>
+                        <button id="goToDashboard" class="btn btn-large">Go to Dashboard</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/utils/auth.js"></script>
+    <script src="js/pages/assessment.js"></script>
+</body>
+</html>
