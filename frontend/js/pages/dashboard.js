@@ -17,6 +17,7 @@ const progressText = document.getElementById('progressText');
 const progressPercent = document.getElementById('progressPercent');
 
 function initDashboard() {
+    checkAssessmentStatus();
     loadUserData();
     
     // Logout handler
@@ -33,10 +34,27 @@ function initDashboard() {
     });
 }
 
+// Check if user has completed assessment
+async function checkAssessmentStatus() {
+    try {
+        const response = await authenticatedFetch('/assessment/status');
+        const status = await response.json();
+        
+        if (!status.completed) {
+            // Redirect to assessment if not completed
+            if (confirm('Please complete the skill assessment to get your personalized learning path.')) {
+                window.location.href = 'assessment.html';
+            }
+        }
+    } catch (error) {
+        console.error('Error checking assessment status:', error);
+    }
+}
+
 // Load user data
 async function loadUserData() {
     try {
-        const response = await authenticatedFetch('api/me');
+        const response = await authenticatedFetch('/me');
         if (!response) return;
 
         const user = await response.json();
@@ -80,22 +98,6 @@ function updateProgressDisplay(data) {
     document.getElementById('timeSpent').textContent = `${data.timeSpent}h`;
     document.getElementById('achievements').textContent = data.achievements;
 }
-
-// Logout handler
-logoutBtn.addEventListener('click', () => {
-    if (confirm('Are you sure you want to logout?')) {
-        logout();
-    }
-});
-
-// Continue learning handler
-continueBtn.addEventListener('click', () => {
-    // TODO: Redirect to current learning module
-    alert('Learning modules coming soon!');
-});
-
-// Initialize dashboard
-loadUserData();
 
 function showError(message) {
     console.error(message);
