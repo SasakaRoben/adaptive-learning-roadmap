@@ -48,10 +48,22 @@ form.addEventListener('submit', async function(e) {
             localStorage.setItem('access_token', data.access_token);
             localStorage.setItem('user', JSON.stringify(data.user));
             
-            // Redirect to dashboard
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 1000 );
+            // Check if user needs assessment
+            setTimeout(async () => {
+                try {
+                    const statusResponse = await authenticatedFetch('/assessment/status');
+                    const status = await statusResponse.json();
+                    
+                    if (!status.completed) {
+                        window.location.href = 'assessment.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
+                } catch (error) {
+                    // Default to dashboard if check fails
+                    window.location.href = 'dashboard.html';
+                }
+            }, 1500);
         } else {
             if (response.status === 401) {
                 showAlert('Invalid username or password', 'error');
