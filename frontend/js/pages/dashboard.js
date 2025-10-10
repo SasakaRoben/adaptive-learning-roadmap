@@ -37,7 +37,7 @@ function initDashboard() {
 // Check if user has completed assessment
 async function checkAssessmentStatus() {
     try {
-        const response = await authenticatedFetch('/assessment/status');
+        const response = await authenticatedFetch('api/assessment/status');
         const status = await response.json();
         
         if (!status.completed) {
@@ -54,7 +54,7 @@ async function checkAssessmentStatus() {
 // Load user data
 async function loadUserData() {
     try {
-        const response = await authenticatedFetch('/me');
+        const response = await authenticatedFetch('api/me');
         if (!response) return;
 
         const user = await response.json();
