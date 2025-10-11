@@ -23,13 +23,31 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
         expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     
     to_encode.update({"exp": expire})
+    
+    # Ensure 'sub' is a string (JWT standard requires it)
+    if 'sub' in to_encode and not isinstance(to_encode['sub'], str):
+        to_encode['sub'] = str(to_encode['sub'])
+    
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
 def verify_token(token: str) -> Optional[dict]:
     """Verify and decode JWT token"""
     try:
+        print(f"[TOKEN DEBUG] Attempting to verify token...")
+        print(f"[TOKEN DEBUG] Token length: {len(token)}")
+        print(f"[TOKEN DEBUG] Secret key exists: {bool(settings.SECRET_KEY)}")
+        print(f"[TOKEN DEBUG] Algorithm: {settings.ALGORITHM}")
+        
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        print(f"[TOKEN DEBUG] Token decoded successfully: {payload}")
         return payload
-    except JWTError:
+    except jwt.ExpiredSignatureError:
+        print("[TOKEN ERROR] Token has expired")
+        return None
+    except jwt.JWTError as e:
+        print(f"[TOKEN ERROR] JWT decode error: {str(e)}")
+        return None
+    except Exception as e:
+        print(f"[TOKEN ERROR] Unexpected error: {str(e)}")
         return None
