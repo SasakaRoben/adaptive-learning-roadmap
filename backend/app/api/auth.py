@@ -15,9 +15,17 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-@router.post("/register", response_model=UserResponse)
+@router.post("/register", response_model=UserResponse, summary="Register new user")
 async def register_user(user: UserRegister):
-    """Register a new user"""
+    """
+    Register a new user account.
+    
+    - **username**: Must be 3-50 characters, alphanumeric and underscores only
+    - **email**: Valid email address
+    - **password**: Minimum 8 characters, must contain uppercase, lowercase, and number
+    
+    Returns user information and success message.
+    """
     try:
         with get_db() as conn:
             cur = conn.cursor()
@@ -47,9 +55,15 @@ async def register_user(user: UserRegister):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
 
-@router.get("/check-username/{username}", response_model=UsernameCheck)
+@router.get("/check-username/{username}", response_model=UsernameCheck, summary="Check username availability")
 async def check_username(username: str):
-    """Check if username is available"""
+    """
+    Check if a username is available for registration.
+    
+    - **username**: Username to check
+    
+    Returns whether the username is available.
+    """
     try:
         with get_db() as conn:
             cur = conn.cursor()
@@ -58,9 +72,15 @@ async def check_username(username: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/check-email/{email}", response_model=EmailCheck)
+@router.get("/check-email/{email}", response_model=EmailCheck, summary="Check email availability")
 async def check_email(email: str):
-    """Check if email is available"""
+    """
+    Check if an email is available for registration.
+    
+    - **email**: Email address to check
+    
+    Returns whether the email is available.
+    """
     try:
         with get_db() as conn:
             cur = conn.cursor()
@@ -69,9 +89,17 @@ async def check_email(email: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/login", response_model=LoginResponse)
+@router.post("/login", response_model=LoginResponse, summary="User login")
 async def login_user(credentials: UserLogin):
-    """Login a user and return JWT token"""
+    """
+    Authenticate user and return JWT access token.
+    
+    - **username**: Username or email address
+    - **password**: User password
+    
+    Returns JWT token for authenticated requests.
+    Token expires after 30 minutes.
+    """
     try:
         with get_db() as conn:
             cur = conn.cursor()
@@ -92,7 +120,7 @@ async def login_user(credentials: UserLogin):
             
             # Create access token
             access_token = create_access_token(
-                data={"sub": user['id'], "username": user['username']}
+                data={"sub": str(user['id']), "username": user['username']}  # Convert user_id to string
             )
             
             return LoginResponse(
@@ -112,9 +140,15 @@ async def login_user(credentials: UserLogin):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Login failed: {str(e)}")
 
-@router.get("/me")
+@router.get("/me", summary="Get current user", response_description="Current authenticated user information")
 async def get_current_user_info(current_user: Dict = Depends(get_current_user)):
-    """Get current authenticated user information (Protected route)"""
+    """
+    Get current authenticated user information.
+    
+    Requires valid JWT token in Authorization header.
+    
+    Returns user profile data for the authenticated user.
+    """
     return {
         "id": current_user['id'],
         "username": current_user['username'],
