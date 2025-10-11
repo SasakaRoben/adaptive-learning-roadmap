@@ -40,8 +40,11 @@ async function authenticatedFetch(endpoint, options = {}) {
         return;
     }
     
+    // Ensure endpoint starts with /
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    
     try {
-        const response = await fetch(`${API_URL}${endpoint}`, {
+        const response = await fetch(`${API_URL}${cleanEndpoint}`, {
             ...options,
             headers: {
                 'Content-Type': 'application/json',
@@ -52,7 +55,7 @@ async function authenticatedFetch(endpoint, options = {}) {
         
         // If unauthorized, logout
         if (response.status === 401) {
-            console.error('Unauthorized, redirecting to login');
+            console.error('Unauthorized (401), token may be invalid or expired');
             logout();
             return;
         }
