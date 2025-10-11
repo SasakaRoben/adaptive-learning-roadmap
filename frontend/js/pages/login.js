@@ -42,16 +42,21 @@ form.addEventListener('submit', async function(e) {
         const data = await response.json();
 
         if (response.ok) {
-            showAlert('Login successful! Redirecting...', 'success');
-            
-            // Store JWT token and user data
+            // Store JWT token and user data FIRST
             localStorage.setItem('access_token', data.access_token);
             localStorage.setItem('user', JSON.stringify(data.user));
             
-            // Check if user needs assessment
+            showAlert('Login successful! Redirecting...', 'success');
+            
+            // Wait a bit to ensure localStorage is written, then check assessment
             setTimeout(async () => {
                 try {
-                    const statusResponse = await authenticatedFetch('/assessment/status');
+                    const token = localStorage.getItem('access_token');
+                    const statusResponse = await fetch('http://localhost:8000/api/assessment/status', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
                     const status = await statusResponse.json();
                     
                     if (!status.completed) {
@@ -60,8 +65,9 @@ form.addEventListener('submit', async function(e) {
                         window.location.href = 'dashboard.html';
                     }
                 } catch (error) {
-                    // Default to dashboard if check fails
-                    window.location.href = 'dashboard.html';
+                    console.error('Error checking assessment:', error);
+                    // Default to assessment page for new users
+                    window.location.href = 'assessment.html';
                 }
             }, 1500);
         } else {
