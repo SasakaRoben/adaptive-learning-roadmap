@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Learning Roadmap - LearnHub</title>
+    <link rel="stylesheet" href="css/roadmap.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">LearnHub</div>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="roadmap.html" class="active">Roadmap</a>
+                <a href="#" id="logoutBtn">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>Your Learning Roadmap</h1>
+            <div class="level-badge" id="levelBadge">Loading...</div>
+        </div>
+
+        <div class="progress-summary">
+            <div class="summary-card">
+                <span class="summary-value" id="completedCount">0</span>
+                <span class="summary-label">Completed</span>
+            </div>
+            <div class="summary-card">
+                <span class="summary-value" id="inProgressCount">0</span>
+                <span class="summary-label">In Progress</span>
+            </div>
+            <div class="summary-card">
+                <span class="summary-value" id="totalCount">0</span>
+                <span class="summary-label">Total Topics</span>
+            </div>
+            <div class="summary-card">
+                <span class="summary-value" id="progressPercent">0%</span>
+                <span class="summary-label">Progress</span>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading your roadmap...</p>
+        </div>
+
+        <div id="roadmapContainer" class="roadmap-container" style="display: none;">
+            <!-- Topics will be inserted here -->
+        </div>
+
+        <!-- Topic Detail Modal -->
+        <div id="topicModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div id="modalBody">
+                    <!-- Topic details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/utils/auth.js"></script>
+    <script src="js/pages/roadmap.js"></script>
+</body>
+</html>
