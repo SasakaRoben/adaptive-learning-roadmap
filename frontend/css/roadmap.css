@@ -33,7 +33,9 @@ body {
     font-weight: bold;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     -webkit-background-clip: text;
+    background-clip: text;           /* standard property for compatibility */
     -webkit-text-fill-color: transparent;
+    color: #764ba2;                  /* fallback for browsers that don't support background-clip:text */
 }
 
 .nav-links {
