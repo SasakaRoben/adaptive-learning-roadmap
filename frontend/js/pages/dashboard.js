@@ -29,8 +29,7 @@ function initDashboard() {
 
     // Continue learning handler
     continueBtn.addEventListener('click', () => {
-        // TODO: Redirect to current learning module
-        alert('Learning modules coming soon!');
+        window.location.href = 'roadmap.html';
     });
 }
 
