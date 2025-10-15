@@ -142,6 +142,46 @@ async function showTopicDetail(topicId) {
                 <p>${topic.content}</p>
             </div>
             
+            ${topic.resources && topic.resources.length > 0 ? `
+                <div class="modal-content-section">
+                    <h3>📚 Learning Resources</h3>
+                    <div class="resources-list">
+                        ${topic.resources.map(resource => `
+                            <a href="${resource.url}" target="_blank" rel="noopener" class="resource-item">
+                                <div class="resource-icon">${getResourceIcon(resource.type)}</div>
+                                <div class="resource-details">
+                                    <div class="resource-title">${resource.title}</div>
+                                    <div class="resource-meta">
+                                        ${resource.platform || 'External'} • ${resource.duration || '?'} min
+                                    </div>
+                                </div>
+                                <div class="resource-arrow">→</div>
+                            </a>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            
+            ${topic.resources && topic.resources.length > 0 ? `
+                <div class="modal-content-section">
+                    <h3>Learning Resources</h3>
+                    <div class="resources-list">
+                        ${topic.resources.map(resource => `
+                            <a href="${resource.url}" target="_blank" class="resource-item">
+                                <div class="resource-icon">${getResourceIcon(resource.type)}</div>
+                                <div class="resource-details">
+                                    <div class="resource-title">${resource.title}</div>
+                                    <div class="resource-meta">
+                                        ${resource.platform} • ${resource.duration} min
+                                    </div>
+                                </div>
+                                <div class="resource-arrow">→</div>
+                            </a>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            
             ${topic.time_spent_minutes > 0 ? `
                 <div class="modal-content-section">
                     <h3>Your Progress</h3>
@@ -254,6 +294,17 @@ function setupEventListeners() {
 // Make functions global for inline onclick handlers
 window.startTopic = startTopic;
 window.completeTopic = completeTopic;
+
+// Helper function for resource icons
+function getResourceIcon(type) {
+    const icons = {
+        video: '🎥',
+        article: '📄',
+        interactive: '💻',
+        documentation: '📚'
+    };
+    return icons[type] || '🔗';
+}
 
 // Initialize
 init();
