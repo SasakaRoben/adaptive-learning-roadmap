@@ -110,3 +110,23 @@ def get_prerequisite_details(cur, topic_id: int) -> List[Dict]:
         WHERE tp.topic_id = %s
     """, (topic_id,))
     return cur.fetchall()
+
+def get_topic_resources(cur, topic_id: int) -> List[Dict]:
+    """Get learning resources for a topic"""
+    cur.execute("""
+        SELECT id, title, resource_url, resource_type, platform, duration_minutes
+        FROM learning_resources
+        WHERE topic_id = %s
+        ORDER BY id
+    """, (topic_id,))
+    return cur.fetchall()
+
+def get_topic_resources(cur, topic_id: int) -> List[Dict]:
+    """Get learning resources for a topic"""
+    cur.execute("""
+        SELECT id, title, resource_url, resource_type, platform, duration_minutes
+        FROM learning_resources
+        WHERE topic_id = %s
+        ORDER BY id
+    """, (topic_id,))
+    return cur.fetchall()
