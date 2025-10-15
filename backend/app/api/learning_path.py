@@ -6,7 +6,7 @@ from app.schemas.learning_path import (
 from app.crud.learning_path import (
     get_user_level, get_topics_by_level, get_topic_prerequisites,
     get_user_progress_for_topic, get_user_completed_topics, determine_topic_status,
-    start_topic, complete_topic, get_topic_detail, get_prerequisite_details
+    start_topic, complete_topic, get_topic_detail, get_prerequisite_details, get_topic_resources
 )
 from app.core.dependencies import get_current_user
 from app.core.database import get_db
@@ -117,6 +117,9 @@ async def get_topic_details(topic_id: int, current_user: Dict = Depends(get_curr
             prerequisites = get_prerequisite_details(cur, topic_id)
             completed_topics = get_user_completed_topics(cur, current_user['id'])
             
+            # Get resources
+            resources = get_topic_resources(cur, topic_id)
+            
             # Determine status
             prereq_ids = [p['id'] for p in prerequisites]
             status = determine_topic_status(topic_id, prereq_ids, completed_topics, user_progress)
@@ -137,7 +140,17 @@ async def get_topic_details(topic_id: int, current_user: Dict = Depends(get_curr
                     {"id": p['id'], "title": p['title'], "level": p['level']} 
                     for p in prerequisites
                 ],
-                resources=[]  # TODO: Add resources later
+                resources=[
+                    {
+                        "id": r['id'],
+                        "title": r['title'],
+                        "url": r['resource_url'],
+                        "type": r['resource_type'],
+                        "platform": r['platform'],
+                        "duration": r['duration_minutes']
+                    }
+                    for r in resources
+                ]
             )
             
     except HTTPException:
