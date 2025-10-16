@@ -1,4 +1,3 @@
-
 from pydantic_settings import BaseSettings
 from typing import Optional
 
@@ -11,6 +10,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    OPENAI_API_KEY: Optional[str] = None
     
     @property
     def database_url(self) -> str:
@@ -20,4 +20,4 @@ class Settings(BaseSettings):
         env_file = ".env"
         case_sensitive = True
 
-settings = Settings() # type: ignore[arg-type]
+settings = Settings()
