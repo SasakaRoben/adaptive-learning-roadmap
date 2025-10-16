@@ -71,21 +71,34 @@ async function loadUserData() {
     }
 }
 
-// Load progress data (mock data for now)
-function loadProgressData() {
-    // TODO: Replace with actual API call to get user's roadmap progress
-    const mockProgress = {
-        completed: 3,
-        total: 10,
-        percentage: 30,
-        streak: 7,
-        timeSpent: 12,
-        achievements: 2
-    };
-    
-    updateProgressDisplay(mockProgress);
+// Load progress data from API
+async function loadProgressData() {
+    try {
+        const response = await authenticatedFetch('/learning-path/');
+        if (!response) {
+            console.error('No response from API');
+            return;
+        }
+        
+        const pathData = await response.json();
+        console.log('API returned:', pathData);
+        
+        // Use REAL data from API
+        const realProgress = {
+            completed: pathData.completed_topics,
+            total: pathData.total_topics,
+            percentage: Math.round(pathData.progress_percentage),
+            streak: 0,
+            timeSpent: 0,
+            achievements: pathData.completed_topics
+        };
+        
+        updateProgressDisplay(realProgress);
+        
+    } catch (error) {
+        console.error('Error loading progress:', error);
+    }
 }
-
 // Update progress display
 function updateProgressDisplay(data) {
     progressFill.style.width = `${data.percentage}%`;
