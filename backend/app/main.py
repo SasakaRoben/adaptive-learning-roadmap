@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.auth import router as auth_router
 from app.api.assessment import router as assessment_router
 from app.api.learning_path import router as learning_path_router
+from app.api.chatbot import router as chatbot_router
 
 app = FastAPI(
     title="Adaptive Learning Roadmap API",
@@ -25,6 +26,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(assessment_router)
 app.include_router(learning_path_router)
+app.include_router(chatbot_router)
 
 # Health check endpoint
 @app.get("/", tags=["health"])
