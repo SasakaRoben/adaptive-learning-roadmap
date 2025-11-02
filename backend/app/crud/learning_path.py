@@ -18,11 +18,13 @@ def get_topics_by_level(cur, level: str) -> List[Dict]:
     return cur.fetchall()
 
 def get_topic_prerequisites(cur, topic_id: int) -> List[int]:
-    """Get prerequisite topic IDs for a topic"""
+    """Get prerequisite topic IDs for a topic (only within the same level)"""
     cur.execute("""
-        SELECT prerequisite_topic_id
-        FROM topic_prerequisites
-        WHERE topic_id = %s
+        SELECT tp.prerequisite_topic_id
+        FROM topic_prerequisites tp
+        INNER JOIN topics t1 ON tp.topic_id = t1.id
+        INNER JOIN topics t2 ON tp.prerequisite_topic_id = t2.id
+        WHERE tp.topic_id = %s AND t1.level = t2.level
     """, (topic_id,))
     return [row['prerequisite_topic_id'] for row in cur.fetchall()]
 
@@ -117,16 +119,6 @@ def get_topic_resources(cur, topic_id: int) -> List[Dict]:
         SELECT id, title, resource_url, resource_type, platform, duration_minutes
         FROM learning_resources
         WHERE topic_id = %s
-        ORDER BY id
-    """, (topic_id,))
-    return cur.fetchall()
-
-def get_topic_resources(cur, topic_id: int) -> List[Dict]:
-    """Get learning resources for a topic"""
-    cur.execute("""
-        SELECT id, title, resource_url, resource_type, platform, duration_minutes
-        FROM learning_resources
-        WHERE topic_id = %s
-        ORDER BY id
+        ORDER BY order_index NULLS LAST, id
     """, (topic_id,))
     return cur.fetchall()

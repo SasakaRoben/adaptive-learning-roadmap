@@ -6,7 +6,6 @@ from app.crud.auth import get_user_by_username, get_user_by_email
 from app.core.security import verify_password, create_access_token
 from app.core.dependencies import get_current_user
 from app.core.database import get_db
-from datetime import timedelta
 from typing import Dict
 
 router = APIRouter(

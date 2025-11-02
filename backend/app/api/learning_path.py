@@ -64,7 +64,7 @@ async def get_learning_path(current_user: Dict = Depends(get_current_user)):
                 elif status == 'in_progress':
                     in_progress_count += 1
                 
-                progress_percentage = user_progress['progress_percentage'] if user_progress else 0
+                progress_percentage = float(user_progress['progress_percentage']) if user_progress else 0
                 
                 topic_responses.append(TopicResponse(
                     id=topic['id'],
@@ -147,7 +147,7 @@ async def get_topic_details(topic_id: int, current_user: Dict = Depends(get_curr
                         "url": r['resource_url'],
                         "type": r['resource_type'],
                         "platform": r['platform'],
-                        "duration": r['duration_minutes']
+                        "duration": int(r['duration_minutes']) if r.get('duration_minutes') is not None else None
                     }
                     for r in resources
                 ]

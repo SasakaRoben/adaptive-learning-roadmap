@@ -1,8 +1,12 @@
 from passlib.context import CryptContext
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
-from jose import JWTError, jwt
+from jose import jwt
+from jose.exceptions import ExpiredSignatureError, JWTError
 from app.core.config import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 pwd_context = CryptContext(schemes=["argon2", "bcrypt"], deprecated="auto")
 
@@ -18,9 +22,9 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     """Create JWT access token"""
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     
     to_encode.update({"exp": expire})
     
@@ -34,20 +38,15 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
 def verify_token(token: str) -> Optional[dict]:
     """Verify and decode JWT token"""
     try:
-        print(f"[TOKEN DEBUG] Attempting to verify token...")
-        print(f"[TOKEN DEBUG] Token length: {len(token)}")
-        print(f"[TOKEN DEBUG] Secret key exists: {bool(settings.SECRET_KEY)}")
-        print(f"[TOKEN DEBUG] Algorithm: {settings.ALGORITHM}")
-        
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        print(f"[TOKEN DEBUG] Token decoded successfully: {payload}")
+        logger.debug(f"Token decoded successfully for user: {payload.get('username', 'unknown')}")
         return payload
-    except jwt.ExpiredSignatureError:
-        print("[TOKEN ERROR] Token has expired")
+    except ExpiredSignatureError:
+        logger.warning("Token verification failed: Token has expired")
         return None
-    except jwt.JWTError as e:
-        print(f"[TOKEN ERROR] JWT decode error: {str(e)}")
+    except JWTError as e:
+        logger.warning(f"Token verification failed: {str(e)}")
         return None
     except Exception as e:
-        print(f"[TOKEN ERROR] Unexpected error: {str(e)}")
+        logger.error(f"[TOKEN ERROR] Unexpected error: {str(e)}", exc_info=True)
         return None

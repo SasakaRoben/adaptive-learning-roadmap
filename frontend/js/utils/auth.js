@@ -1,5 +1,5 @@
 // Authentication utility functions
-const API_URL = 'http://localhost:8000/api';
+const API_URL = window.APP_CONFIG?.API_URL || 'http://localhost:8000/api';
 
 // Get stored token
 function getToken() {

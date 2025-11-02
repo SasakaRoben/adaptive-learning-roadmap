@@ -10,9 +10,16 @@ def get_assessment_questions(cur) -> List[Dict]:
     """)
     return cur.fetchall()
 
-def calculate_user_level(score: int, total: int) -> str:
-    """Determine user level based on score"""
-    percentage = (score / total) * 100
+def calculate_user_level(score: int, total_points: int) -> str:
+    """Determine user level based on percentage of total points.
+    score: accumulated points from correct answers
+    total_points: maximum attainable points across all questions
+    """
+    if not total_points or total_points <= 0:
+        # Fallback to beginner if misconfigured; caller should normally guard
+        return "beginner"
+    
+    percentage = (score / total_points) * 100
     
     if percentage <= 40:
         return "beginner"

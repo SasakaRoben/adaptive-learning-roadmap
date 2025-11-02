@@ -5,8 +5,9 @@ from app.services.chatbot import get_chatbot_response, generate_quiz
 from app.core.dependencies import get_current_user
 from app.core.database import get_db
 from app.crud.learning_path import (
-    get_user_level, get_user_progress_for_topic, 
-    get_user_completed_topics, get_topic_detail
+    get_user_level,
+    get_user_completed_topics,
+    get_topic_detail,
 )
 
 router = APIRouter(

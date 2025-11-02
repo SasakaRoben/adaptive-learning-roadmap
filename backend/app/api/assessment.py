@@ -34,7 +34,8 @@ async def get_questions(current_user: Dict = Depends(get_current_user)):
                     "id": q['id'],
                     "question_text": q['question_text'],
                     "question_type": q['question_type'],
-                    "options": q['options'],
+                    # Ensure options is always a list for the schema
+                    "options": q['options'] or [],
                     "order_index": q['order_index']
                 }
                 for q in questions
@@ -61,7 +62,7 @@ async def submit_assessment(
             
             # Calculate score
             score = 0
-            total = len(questions)
+            total_questions = len(questions)
             
             # Create answer map
             answer_map = {ans.question_id: ans.answer for ans in submission.answers}
@@ -70,6 +71,12 @@ async def submit_assessment(
             cur.execute("SELECT id, correct_answer, points FROM assessment_questions")
             correct_answers = {row['id']: row for row in cur.fetchall()}
             
+            # Compute maximum possible points (handles variable point weights)
+            max_points = sum((row.get('points') or 0) for row in correct_answers.values())
+            
+            if total_questions == 0 or max_points == 0:
+                raise HTTPException(status_code=400, detail="No assessment questions available")
+            
             # Score answers
             for q_id, user_answer in answer_map.items():
                 if q_id in correct_answers:
@@ -77,17 +84,17 @@ async def submit_assessment(
                         score += correct_answers[q_id]['points']
             
             # Determine level
-            assigned_level = calculate_user_level(score, total)
+            assigned_level = calculate_user_level(score, max_points)
             
             # Save result
             answers_data = [
                 {"question_id": ans.question_id, "answer": ans.answer}
                 for ans in submission.answers
             ]
-            save_assessment_result(cur, current_user['id'], score, total, assigned_level, answers_data)
+            save_assessment_result(cur, current_user['id'], score, total_questions, assigned_level, answers_data)
             
             # Generate response message
-            percentage = (score / total) * 100
+            percentage = (score / max_points) * 100
             
             level_messages = {
                 "beginner": {
@@ -106,7 +113,7 @@ async def submit_assessment(
             
             return AssessmentResult(
                 score=score,
-                total_questions=total,
+                total_questions=total_questions,
                 percentage=round(percentage, 2),
                 assigned_level=assigned_level,
                 message=level_messages[assigned_level]["message"],

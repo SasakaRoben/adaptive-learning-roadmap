@@ -2,44 +2,48 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.core.security import verify_token
 from app.core.database import get_db
-from typing import Dict
-import traceback
+from typing import Dict, Any
+import logging
+
+logger = logging.getLogger(__name__)
 
 security = HTTPBearer()
 
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> Dict:
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> Dict[str, Any]:
     """
     Dependency to get current authenticated user from JWT token
     Usage: user = Depends(get_current_user)
     """
     try:
         token = credentials.credentials
-        print(f"[AUTH DEBUG] Received token: {token[:20]}...")  # Print first 20 chars
+        logger.debug(f"Received authentication token for verification")
         
         payload = verify_token(token)
-        print(f"[AUTH DEBUG] Token payload: {payload}")
         
         if payload is None:
-            print("[AUTH ERROR] Token verification failed - payload is None")
+            logger.warning("Token verification failed - invalid or expired token")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid or expired token",
                 headers={"WWW-Authenticate": "Bearer"},
             )
         
-        user_id: int = payload.get("sub")
-        print(f"[AUTH DEBUG] Extracted user_id (raw): {user_id}")
-        
-        # Convert string to int if needed
-        if isinstance(user_id, str):
-            user_id = int(user_id)
-            print(f"[AUTH DEBUG] Converted user_id to int: {user_id}")
-        
-        if user_id is None:
-            print("[AUTH ERROR] No 'sub' field in token payload")
+        sub = payload.get("sub")
+        if sub is None:
+            logger.warning("Token payload missing user ID (sub field)")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token format - missing user ID",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        # Convert to int; JWT 'sub' should be a string, but we accept int as well
+        try:
+            user_id: int = int(sub)
+        except (TypeError, ValueError):
+            logger.warning("Token payload has non-numeric user ID (sub field)")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token format - bad subject",
                 headers={"WWW-Authenticate": "Bearer"},
             )
         
@@ -53,22 +57,21 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             user = cur.fetchone()
         
         if user is None:
-            print(f"[AUTH ERROR] User not found in database: user_id={user_id}")
+            logger.warning(f"User not found in database: user_id={user_id}")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="User not found"
             )
         
-        print(f"[AUTH SUCCESS] User authenticated: {user['username']}")
+        logger.debug(f"User authenticated successfully: {user['username']}")
         return user
         
     except HTTPException:
         raise
     except Exception as e:
-        print(f"[AUTH ERROR] Unexpected error: {str(e)}")
-        traceback.print_exc()
+        logger.error(f"Authentication error: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Authentication failed: {str(e)}",
+            detail="Authentication failed",
             headers={"WWW-Authenticate": "Bearer"},
         )

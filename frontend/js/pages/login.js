@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8000/api';
+const API_URL = window.APP_CONFIG?.API_URL || 'http://localhost:8000/api';
 
 const form = document.getElementById('loginForm');
 const usernameInput = document.getElementById('username');
@@ -52,7 +52,7 @@ form.addEventListener('submit', async function(e) {
             setTimeout(async () => {
                 try {
                     const token = localStorage.getItem('access_token');
-                    const statusResponse = await fetch('http://localhost:8000/api/assessment/status', {
+                    const statusResponse = await fetch(`${API_URL}/assessment/status`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }

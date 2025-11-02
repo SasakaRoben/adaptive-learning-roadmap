@@ -11,7 +11,7 @@ class TopicResponse(BaseModel):
     order_index: int
     level: str
     status: str  # 'locked', 'available', 'in_progress', 'completed'
-    progress_percentage: int
+    progress_percentage: float
     prerequisites: List[int]  # List of prerequisite topic IDs
 
 class LearningPathResponse(BaseModel):
@@ -31,7 +31,7 @@ class TopicDetailResponse(BaseModel):
     estimated_hours: float
     level: str
     status: str
-    progress_percentage: int
+    progress_percentage: float
     time_spent_minutes: int
     last_accessed: Optional[datetime]
     prerequisites: List[dict]  # List of prerequisite topics with details

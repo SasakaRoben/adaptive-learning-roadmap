@@ -9,7 +9,8 @@ def check_username_exists(cur, username: str) -> bool:
 
 def check_email_exists(cur, email: str) -> bool:
     """Check if email already exists"""
-    cur.execute("SELECT id FROM users WHERE email = %s", (email,))
+    # Case-insensitive email check to avoid duplicates with different casing
+    cur.execute("SELECT id FROM users WHERE LOWER(email) = LOWER(%s)", (email,))
     return cur.fetchone() is not None
 
 def create_user(cur, user: UserRegister) -> Optional[Dict]:

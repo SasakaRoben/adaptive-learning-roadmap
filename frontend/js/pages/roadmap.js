@@ -162,26 +162,6 @@ async function showTopicDetail(topicId) {
                 </div>
             ` : ''}
             
-            ${topic.resources && topic.resources.length > 0 ? `
-                <div class="modal-content-section">
-                    <h3>Learning Resources</h3>
-                    <div class="resources-list">
-                        ${topic.resources.map(resource => `
-                            <a href="${resource.url}" target="_blank" class="resource-item">
-                                <div class="resource-icon">${getResourceIcon(resource.type)}</div>
-                                <div class="resource-details">
-                                    <div class="resource-title">${resource.title}</div>
-                                    <div class="resource-meta">
-                                        ${resource.platform} • ${resource.duration} min
-                                    </div>
-                                </div>
-                                <div class="resource-arrow">→</div>
-                            </a>
-                        `).join('')}
-                    </div>
-                </div>
-            ` : ''}
-            
             ${topic.time_spent_minutes > 0 ? `
                 <div class="modal-content-section">
                     <h3>Your Progress</h3>
@@ -235,11 +215,10 @@ async function startTopic(topicId) {
         if (!response) return;
         
         const result = await response.json();
-        alert(result.message);
         
-        // Reload the roadmap
-        topicModal.style.display = 'none';
+        // Reload the roadmap and reopen this topic's modal
         await loadLearningPath();
+        await showTopicDetail(topicId);
         
     } catch (error) {
         console.error('Error starting topic:', error);
@@ -249,7 +228,7 @@ async function startTopic(topicId) {
 
 // Complete topic
 async function completeTopic(topicId) {
-    if (!confirm('Are you sure you completed this topic?')) return;
+    if (!confirm('Mark this topic as completed?')) return;
     
     try {
         const response = await authenticatedFetch(`/learning-path/topics/${topicId}/complete`, {
@@ -259,11 +238,13 @@ async function completeTopic(topicId) {
         if (!response) return;
         
         const result = await response.json();
-        alert(result.message);
         
-        // Reload the roadmap
+        // Close modal and reload the roadmap
         topicModal.style.display = 'none';
         await loadLearningPath();
+        
+        // Show success message
+        alert('Topic completed! 🎉');
         
     } catch (error) {
         console.error('Error completing topic:', error);

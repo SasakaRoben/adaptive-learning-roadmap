@@ -11,7 +11,7 @@ def get_user_by_username(cur, username: str) -> Optional[Dict]:
 def get_user_by_email(cur, email: str) -> Optional[Dict]:
     """Get user by email"""
     cur.execute(
-        "SELECT id, username, email, password_hash FROM users WHERE email = %s",
+        "SELECT id, username, email, password_hash FROM users WHERE LOWER(email) = LOWER(%s) LIMIT 1",
         (email,)
     )
     return cur.fetchone()
