@@ -3,8 +3,14 @@ import sys
 import traceback
 from fastapi import FastAPI
 
-# Ensure backend package is importable when Vercel runs from repo root
+# Ensure the repository root (and legacy backend folder) are importable when
+# Vercel runs from the project root. This lets `import app.main` resolve when
+# the `app/` package is at the repository root.
 ROOT = os.path.dirname(os.path.dirname(__file__))
+# Add repo root first so top-level `app` package is found
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
+# Also add legacy `backend/` path for older layouts that put the package there
 BACKEND_PATH = os.path.join(ROOT, 'backend')
 if BACKEND_PATH not in sys.path:
     sys.path.insert(0, BACKEND_PATH)
