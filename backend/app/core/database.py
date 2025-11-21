@@ -8,15 +8,13 @@ from psycopg import Connection as PGConnection
 def get_db_connection() -> PGConnection:
     """Create a database connection.
 
-    Returns a psycopg2 connection configured with a dict-like cursor.
+    Returns a psycopg connection configured with a dict-like cursor.
+    Supports both DATABASE_URL and individual connection parameters.
     A small connect timeout and application_name are set for resilience and observability.
     """
+    db_params = settings.get_db_params()
     conn = psycopg.connect(
-        host=settings.DATABASE_HOST,
-        port=settings.DATABASE_PORT,
-        dbname=settings.DATABASE_NAME,
-        user=settings.DATABASE_USER,
-        password=settings.DATABASE_PASSWORD,
+        **db_params,
         connect_timeout=10,
         application_name="adaptive-learning-api",
         row_factory=dict_row,
