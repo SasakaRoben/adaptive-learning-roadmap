@@ -1,6 +1,6 @@
 # Multi-stage Dockerfile for Adaptive Learning Roadmap
 # Stage 1: Backend
-FROM python:3.11-slim as backend
+FROM python:3.11-slim AS backend
 
 WORKDIR /app
 
