@@ -5,6 +5,7 @@ from app.api.assessment import router as assessment_router
 from app.api.learning_path import router as learning_path_router
 from app.api.chatbot import router as chatbot_router
 from app.core.database import get_db_connection
+from app.core.config import settings
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,16 +19,25 @@ app = FastAPI(
 )
 
 # CORS configuration - allows frontend to connect
+# Default origins for development
+default_origins = [
+    "http://localhost:5500",      # Live Server default
+    "http://127.0.0.1:5500",      # Live Server alternative
+    "http://localhost:3000",      # React/Next.js default
+    "http://localhost:8080",      # Alternative dev server
+    "http://localhost",           # Docker frontend
+]
+
+# Add production origins from environment variable if set
+cors_origins = default_origins.copy()
+if settings.CORS_ORIGINS:
+    # Parse comma-separated origins from environment
+    additional_origins = [origin.strip() for origin in settings.CORS_ORIGINS.split(',')]
+    cors_origins.extend(additional_origins)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5500",      # Live Server default
-        "http://127.0.0.1:5500",      # Live Server alternative
-        "http://localhost:3000",      # React/Next.js default
-        "http://localhost:8080",      # Alternative dev server
-        # Add production URLs here:
-        # "https://your-production-domain.com"
-    ],
+    allow_origins=cors_origins,
     # Allow any localhost/127.0.0.1 port during development
     allow_origin_regex=r"^http://(localhost|127\\.0\\.0\\.1)(:\\d+)?$",
     allow_credentials=True,
